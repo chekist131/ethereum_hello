@@ -21,7 +21,7 @@ public class Main {
         MyContract myContract = MyContract.deploy(web3j, transactionManager, new DefaultGasProvider()).send();
         subscribe(myContract);
 
-        for(int i = 0 ; i < 100; i++) {
+        for(int i = 0 ; i < 1000; i++) {
             myContract.emitEvent(Integer.toString(i)).sendAsync();
         }
         System.out.println("Закончил отправку транзакций");
@@ -35,17 +35,14 @@ public class Main {
 
     private static void subscribe(MyContract myContract) {
         final int[] max = {0};
-        final int[] count = {0};
 
         Observable<MyContract.TxEventResponse> observable = myContract.txEventObservable(DefaultBlockParameter.valueOf(BigInteger.ONE), DefaultBlockParameterName.LATEST);
         observable.subscribe(next -> {
             Integer counter = Integer.valueOf(next.message);
             if(counter > max[0]) {
                 max[0] = counter;
-                System.out.println("Max: " + max[0] + ", count:" + count[0]);
+                System.out.println("Max: " + max[0]);
             }
-            System.out.println(Integer.valueOf(next.message));
-            ++count[0];
         }, error -> {
             System.out.println(new Exception("Ошибка сабскрайбера", error));
         });
